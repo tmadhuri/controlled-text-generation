@@ -114,3 +114,10 @@ ENV/
 .vscode
 .data
 .vector_cache
+
+rawDataFiles/
+MR/
+TeSA/
+HiSA
+TREC-En/
+TREC-Hi/

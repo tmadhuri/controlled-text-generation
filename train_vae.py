@@ -9,7 +9,7 @@ import torch.optim as optim
 import numpy as np
 from torch.autograd import Variable
 
-from ctextgen.dataset import *
+from ctextgen.dataset import SST_Dataset, MR_Dataset
 from ctextgen.model import RNN_VAE
 
 import argparse
@@ -24,8 +24,39 @@ parser.add_argument('--gpu', default=False, action='store_true',
 parser.add_argument('--save', default=False, action='store_true',
                     help='whether to save model or not')
 
+datasets = {
+    'sst': SST_Dataset,
+    'mr': MR_Dataset,
+}
+
+parser.add_argument('--dataset', type=lambda d: datasets[d.lower()],
+                    choices=datasets.values(), required=True,
+                    help='whether to save model or not')
+
+parser.add_argument('-t', '--tokenizer', type=str,
+                    choices=["char", "word", "syl", "spacy"], required=True,
+                    help='Tokenizer to use')
+
+parser.add_argument('-n', '--ngrams', type=int, default=1,
+                    help='Size of ngrams')
+
+parser.add_argument('-e', '--embeddings', type=str,
+                    choices=['Glove', 'word2vec', 'FastText', 'FastTextOOV'],
+                    default='rand',
+                    help='Which embeddings to use.')
+
+parser.add_argument('-d', '--dimension', type=int, default=300,
+                    help='Size of embedding vector')
+
 args = parser.parse_args()
 
+dataset = args.dataset(tokenizer=args.tokenizer,
+                       ngrams=args.ngrams,
+                       emb=args.embeddings,
+                       emb_dim=args.dimension)
+
+print(args)
+1/0
 
 mb_size = 32
 z_dim = 20
@@ -36,8 +67,6 @@ n_iter = 20000
 log_interval = 1000
 z_dim = h_dim
 c_dim = 2
-
-dataset = SST_Dataset()
 
 model = RNN_VAE(
     dataset.n_vocab, h_dim, z_dim, c_dim, p_word_dropout=0.3,
