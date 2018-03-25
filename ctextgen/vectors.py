@@ -4,6 +4,8 @@ import fastText
 import numpy as np
 
 from torchtext.vocab import Vectors
+from torchtext.vocab import GloVe as Glv
+from torchtext.vocab import FastText as Ftxt
 
 
 class FastTextOOV(Vectors):
@@ -40,3 +42,13 @@ class RandVec(Vectors):
         return torch.Tensor(
                     np.random.uniform(-0.25, 0.25, self.dim)
                 ).view(1, -1)
+
+
+class FastText(Ftxt):
+    def __init__(self, language, **kwargs):
+        super(FastText, self).__init__(language=language)
+
+
+class GloVe(Glv):
+    def __init__(self, dim=300, name="6B", **kwargs):
+        super(GloVe, self).__init__(name=name, dim=dim)

@@ -1,5 +1,4 @@
-from torchtext.vocab import GloVe, FastText
-from ctextgen.vectors import FastTextOOV, Word2Vec, RandVec
+from ctextgen.vectors import FastTextOOV, Word2Vec, RandVec, GloVe, FastText
 
 
 def getTokenizer(tokenizer, ngrams):
