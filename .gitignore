@@ -121,3 +121,6 @@ TeSA/
 HiSA
 TREC-En/
 TREC-Hi/
+
+run.sh
+*.p

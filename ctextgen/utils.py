@@ -1,5 +1,5 @@
-from torchtext.vocab import Glove, FastText
-from vectors import FastTextOOV, Word2Vec, RandVec
+from torchtext.vocab import GloVe, FastText
+from ctextgen.vectors import FastTextOOV, Word2Vec, RandVec
 
 
 def getTokenizer(tokenizer, ngrams):
@@ -18,10 +18,14 @@ def getTokenizer(tokenizer, ngrams):
 
 
 def getEmbeddings(emb, **kwargs):
-    embeddings = {'Glove': Glove,
+    embeddings = {'Glove': GloVe,
                   'FastText': FastText,
                   'FastTextOOV': FastTextOOV,
                   'word2vec': Word2Vec,
                   'rand': RandVec}
 
     return embeddings[emb](**kwargs)
+
+
+def sort_key(ex):
+    return len(ex.text)

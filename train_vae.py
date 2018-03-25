@@ -55,8 +55,6 @@ dataset = args.dataset(tokenizer=args.tokenizer,
                        emb=args.embeddings,
                        emb_dim=args.dimension)
 
-print(args)
-1/0
 
 mb_size = 32
 z_dim = 20

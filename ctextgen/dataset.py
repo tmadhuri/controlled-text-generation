@@ -1,7 +1,7 @@
 from torchtext import data, datasets
 from torchtext.vocab import GloVe, FastText
 
-import utils
+from ctextgen import utils
 
 
 class SST_Dataset:
@@ -123,7 +123,6 @@ class WikiText_Dataset:
 
 
 class MR_Dataset:
-
     def __init__(self, emb='rand', emb_dim=50,
                  tokenizer='spacy', ngrams=1,
                  mbsize=32):
@@ -134,23 +133,24 @@ class MR_Dataset:
                                 use_vocab=False)
 
         train, test = data.TabularDataset.splits(
-            fields=[('text', self.TEXT), ('label', self.LABELS)],
-            path="MR/0/", train="train.txt", test="test.txt", format="tsv"
+            fields=[('text', self.TEXT), ('label', self.LABEL)],
+            path=".data/MR/0/", train="train.txt", test="test.txt", format="tsv"
         )
 
-        train, val = train.split(0.9)
+        train, val = train.split(0.9, stratified=False, strata_field='label')
 
         self.TEXT.build_vocab(train,
                               vectors=utils.getEmbeddings(emb,
                                                           dim=emb_dim,
                                                           language='en'))
-        self.LABEL.build_vocab(train, stratified=False, strata_field='label')
+        self.LABEL.build_vocab(train)
 
         self.n_vocab = len(self.TEXT.vocab.itos)
         self.emb_dim = emb_dim
 
         self.train_iter, self.val_iter, _ = data.BucketIterator.splits(
-            (train, val, test), batch_size=mbsize, device=-1, shuffle=True
+            (train, val, test), batch_size=mbsize, device=-1, shuffle=True,
+            sort_key=utils.sort_key
         )
 
     def get_vocab_vectors(self):

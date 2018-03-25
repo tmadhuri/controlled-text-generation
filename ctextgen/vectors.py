@@ -10,6 +10,7 @@ class FastTextOOV(Vectors):
     url_base = 'https://example.com/fasttext-vectors/wiki.{}.bin'
 
     def __init__(self, language="en", cache=None, **kwargs):
+        self.dim = 300
         url = self.url_base.format(language)
         name = os.path.basename(url)
         cache = '.vector_cache' if cache is None else cache
@@ -25,6 +26,7 @@ class Word2Vec(Vectors):
     name_base = "{}_w2v.vectors"
 
     def __init__(self, language="en", **kwargs):
+        self.dim = 300
         name = self.name_base.format(language)
 
         super(Word2Vec, self).__init__(name, **kwargs)
