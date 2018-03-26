@@ -36,13 +36,13 @@ class Word2Vec(Vectors):
     def __getitem__(self, token):
         return torch.Tensor(self.tokenToVec[token]).view(1, -1)
 
-    def load_bin_vec(fname, vocab):
+    def load_bin_vec(self, fname):
         word_vecs = {}
         with open(fname, "rb") as f:
             header = f.readline()
             vocab_size, layer1_size = map(int, header.split())
             binary_len = np.dtype('float32').itemsize * layer1_size
-            for line in xrange(vocab_size):
+            for line in range(vocab_size):
                 word = []
                 while True:
                     ch = f.read(1)
