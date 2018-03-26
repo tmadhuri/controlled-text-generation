@@ -6,6 +6,7 @@ import numpy as np
 from torchtext.vocab import Vectors
 from torchtext.vocab import GloVe as Glv
 from torchtext.vocab import FastText as Ftxt
+from gensim.models import KeyedVectors
 
 
 class FastTextOOV(Vectors):
@@ -31,29 +32,15 @@ class Word2Vec(Vectors):
         self.dim = 300
         name = self.name_base.format(language)
         cache = '/home/srishti/vector_cache' if cache is None else cache
-        self.tokenToVec = self.load_bin_vec(os.path.join(cache, name))
+        self.unk_init = torch.Tensor.zero_
+        self.m = KeyedVectors.load_word2vec_format(os.path.join(cache, name),
+                                                   binary=True)
 
     def __getitem__(self, token):
-        return torch.Tensor(self.tokenToVec[token]).view(1, -1)
-
-    def load_bin_vec(self, fname):
-        word_vecs = {}
-        with open(fname, "rb") as f:
-            header = f.readline()
-            vocab_size, layer1_size = map(int, header.split())
-            binary_len = np.dtype('float32').itemsize * layer1_size
-            for line in range(vocab_size):
-                word = []
-                while True:
-                    ch = f.read(1)
-                    if ch == ' ':
-                        word = ''.join(word)
-                        break
-                    if ch != '\n':
-                        word.append(ch)
-                word_vecs[word.decode('utf-8', 'ignore').strip()] \
-                    = np.fromstring(f.read(binary_len), dtype='float32')
-        return word_vecs
+        try:
+            return torch.Tensor(self.m[token]).view(1, -1)
+        except KeyError:
+            return self.unk_init(torch.Tensor(1, self.dim))
 
 
 class RandVec(Vectors):
