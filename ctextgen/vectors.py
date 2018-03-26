@@ -27,12 +27,33 @@ class FastTextOOV(Vectors):
 class Word2Vec(Vectors):
     name_base = "{}_w2v.vectors"
 
-    def __init__(self, language="en", **kwargs):
+    def __init__(self, language="en", cache=None, **kwargs):
         self.dim = 300
         name = self.name_base.format(language)
+        cache = '/home/srishti/vector_cache' if cache is None else cache
+        self.tokenToVec = self.load_bin_vec(os.path.join(cache, name))
 
-        super(Word2Vec, self).__init__(name,
-                                       cache="/home/srishti/vector_cache")
+    def __getitem__(self, token):
+        return torch.Tensor(self.tokenToVec[token]).view(1, -1)
+
+    def load_bin_vec(fname, vocab):
+        word_vecs = {}
+        with open(fname, "rb") as f:
+            header = f.readline()
+            vocab_size, layer1_size = map(int, header.split())
+            binary_len = np.dtype('float32').itemsize * layer1_size
+            for line in xrange(vocab_size):
+                word = []
+                while True:
+                    ch = f.read(1)
+                    if ch == ' ':
+                        word = ''.join(word)
+                        break
+                    if ch != '\n':
+                        word.append(ch)
+                word_vecs[word.decode('utf-8', 'ignore').strip()] \
+                    = np.fromstring(f.read(binary_len), dtype='float32')
+        return word_vecs
 
 
 class RandVec(Vectors):
