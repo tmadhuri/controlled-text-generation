@@ -134,7 +134,8 @@ class MR_Dataset:
 
         train, test = data.TabularDataset.splits(
             fields=[('text', self.TEXT), ('label', self.LABEL)],
-            path=".data/MR/0/", train="train.txt", test="test.txt", format="tsv"
+            path="/scratch/madhuri/.data/MR/0/", train="train.txt",
+            test="test.txt", format="tsv"
         )
 
         train, val = train.split(0.9, stratified=False, strata_field='label')
