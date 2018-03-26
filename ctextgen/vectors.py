@@ -15,7 +15,7 @@ class FastTextOOV(Vectors):
         self.dim = 300
         url = self.url_base.format(language)
         name = os.path.basename(url)
-        cache = '/scratch/madhuri/.vector_cache' if cache is None else cache
+        cache = '/home/srishti/vector_cache' if cache is None else cache
 
         model = os.path.join(cache, os.path.basename(name))
         self.m = fastText.FastText.load_model(model)
@@ -32,8 +32,7 @@ class Word2Vec(Vectors):
         name = self.name_base.format(language)
 
         super(Word2Vec, self).__init__(name,
-                                       cache="/scratch/madhuri/.vector_cache",
-                                       **kwargs)
+                                       cache="/home/srishti/vector_cache")
 
 
 class RandVec(Vectors):
@@ -49,10 +48,10 @@ class RandVec(Vectors):
 class FastText(Ftxt):
     def __init__(self, language, **kwargs):
         super(FastText, self).__init__(language=language,
-                                       cache="/scratch/madhuri/.vector_cache")
+                                       cache="/home/srishti/vector_cache")
 
 
 class GloVe(Glv):
-    def __init__(self, dim=300, name="6B", **kwargs):
+    def __init__(self, dim=300, name="42B", **kwargs):
         super(GloVe, self).__init__(name=name, dim=dim,
-                                    cache="/scratch/madhuri/.vector_cache")
+                                    cache="/home/srishti/vector_cache")
