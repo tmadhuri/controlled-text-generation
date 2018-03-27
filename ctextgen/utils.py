@@ -2,6 +2,7 @@ from ctextgen.vectors import FastTextOOV, Word2Vec, RandVec, GloVe, FastText
 
 from libindic.syllabifier import Syllabifier
 from hyphen import Hyphenator
+from functools import reduce
 
 
 def getTokenizer(tokenizer, ngrams, language):
@@ -26,8 +27,6 @@ def getTokenizer(tokenizer, ngrams, language):
                             if (len(x) > 1 and len(en.syllables(x)) > 0)
                             else [x],
                             words)
-            syl_split = map(lambda x: x[:-1] + [x[-1] + u">"],
-                            map(lambda x: [u"<" + x[0]] + x[1:], syl_split))
             comb_syl_split = map(lambda x: ["".join(x[i:i + ngrams])
                                             for i in
                                             range(max(len(x) - ngrams + 1,
@@ -40,8 +39,6 @@ def getTokenizer(tokenizer, ngrams, language):
                             if (len(x) > 1 and len(te.syllabify_te(x)) > 0)
                             else [x],
                             words)
-            syl_split = map(lambda x: x[:-1] + [x[-1] + u">"],
-                            map(lambda x: [u"<" + x[0]] + x[1:], syl_split))
             comb_syl_split = map(lambda x: ["".join(x[i:i + ngrams])
                                             for i in
                                             range(max(len(x) - ngrams + 1,
@@ -55,8 +52,6 @@ def getTokenizer(tokenizer, ngrams, language):
                             if (len(x) > 1 and len(hi.syllabify_hi(x)) > 0)
                             else [x],
                             words)
-            syl_split = map(lambda x: x[:-1] + [x[-1] + u">"],
-                            map(lambda x: [u"<" + x[0]] + x[1:], syl_split))
             comb_syl_split = map(lambda x: ["".join(x[i:i + ngrams])
                                             for i in
                                             range(max(len(x) - ngrams + 1,
