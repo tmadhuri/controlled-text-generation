@@ -80,3 +80,10 @@ def getEmbeddings(emb, **kwargs):
 
 def sort_key(ex):
     return len(ex.text)
+
+
+def filter(max_filter_size):
+    def filter_pred(ex):
+        return (len(ex.text) > max_filter_size)
+
+    return filter_pred
