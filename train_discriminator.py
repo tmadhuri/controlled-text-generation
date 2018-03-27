@@ -49,9 +49,11 @@ parser.add_argument('-e', '--embeddings', type=str,
 parser.add_argument('-d', '--dimension', type=int, default=300,
                     help='Size of embedding vector')
 
+parser.add_argument('-c', '--num_classes', type=int, default=3,
+                    help='Number of classes in dataset.')
+
 args = parser.parse_args()
 
-print(args.dataset)
 
 dataset = args.dataset(tokenizer=args.tokenizer,
                        ngrams=args.ngrams,
@@ -67,7 +69,7 @@ lr_decay_every = 1000000
 n_iter = 5000
 log_interval = 100
 z_dim = h_dim
-c_dim = 2
+c_dim = args.num_classes
 kl_weight_max = 0.4
 
 # Specific hyperparams
@@ -75,8 +77,6 @@ beta = 0.1
 lambda_c = 0.1
 lambda_z = 0.1
 lambda_u = 0.1
-
-print(dataset.n_vocab)
 
 model = RNN_VAE(
     dataset.n_vocab, h_dim, z_dim, c_dim, p_word_dropout=0.3,

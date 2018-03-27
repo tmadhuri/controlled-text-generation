@@ -3,6 +3,8 @@ from torchtext.vocab import GloVe, FastText
 
 from ctextgen import utils
 
+import random
+
 
 class SST_Dataset:
 
@@ -138,7 +140,8 @@ class MR_Dataset:
             test="test.txt", format="tsv"
         )
 
-        train, val = train.split(0.9, stratified=False, strata_field='label')
+        random.seed(1245)
+        train, val = train.split(0.9, stratified=False, strata_field='label', random_state=random.getstate())
 
         self.TEXT.build_vocab(train,
                               vectors=utils.getEmbeddings(emb,
