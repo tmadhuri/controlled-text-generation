@@ -13,7 +13,10 @@ class RNN_VAE(nn.Module):
     3. Kim, Yoon. "Convolutional neural networks for sentence classification." arXiv preprint arXiv:1408.5882 (2014).
     """
 
-    def __init__(self, n_vocab, h_dim, z_dim, c_dim, p_word_dropout=0.3, unk_idx=0, pad_idx=1, start_idx=2, eos_idx=3, max_sent_len=15, pretrained_embeddings=None, freeze_embeddings=False, gpu=False):
+    def __init__(self, n_vocab, h_dim, z_dim, c_dim, p_word_dropout=0.3,
+                 unk_idx=0, pad_idx=1, start_idx=2, eos_idx=3, max_sent_len=15,
+                 pretrained_embeddings=None, freeze_embeddings=False,
+                 gpu=False):
         super(RNN_VAE, self).__init__()
 
         self.UNK_IDX = unk_idx

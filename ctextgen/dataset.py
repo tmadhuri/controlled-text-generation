@@ -168,6 +168,8 @@ class MR_Dataset:
         if gpu:
             return batch.text.cuda(), batch.label.cuda()
 
+        print(batch.text, len(batch.text))
+
         return batch.text, batch.label
 
     def next_validation_batch(self, gpu=False):
