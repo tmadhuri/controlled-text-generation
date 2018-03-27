@@ -123,7 +123,7 @@ class WikiText_Dataset:
 
 
 class MR_Dataset:
-    def __init__(self, emb='rand', emb_dim=50,
+    def __init__(self, emb='rand', emb_dim=300,
                  tokenizer='spacy', ngrams=1,
                  mbsize=32):
         self.TEXT = data.Field(init_token='<start>', eos_token='<eos>',

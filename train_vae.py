@@ -31,7 +31,7 @@ datasets = {
 
 parser.add_argument('--dataset', type=lambda d: datasets[d.lower()],
                     choices=datasets.values(), required=True,
-                    help='whether to save model or not')
+                    help='Dataset to be used.')
 
 parser.add_argument('-t', '--tokenizer', type=str,
                     choices=["char", "word", "syl", "spacy"], required=True,
@@ -50,6 +50,8 @@ parser.add_argument('-d', '--dimension', type=int, default=300,
 
 args = parser.parse_args()
 
+print(args.dataset)
+
 dataset = args.dataset(tokenizer=args.tokenizer,
                        ngrams=args.ngrams,
                        emb=args.embeddings,
@@ -65,6 +67,8 @@ n_iter = 20000
 log_interval = 1000
 z_dim = h_dim
 c_dim = 2
+
+print(dataset.n_vocab)
 
 model = RNN_VAE(
     dataset.n_vocab, h_dim, z_dim, c_dim, p_word_dropout=0.3,
