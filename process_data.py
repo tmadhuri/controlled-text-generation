@@ -59,7 +59,8 @@ def build_data_cv(dataset, cv=10, clean_string=True):
                                     if (len(x) > 1 and len(en.syllables(x)) > 0)
                                     else [x],
                                     words)
-                    syl_split = map(lambda x: x[:-1] + [x[-1] + u">"], map(lambda x: [u"<" + x[0]] + x[1:], syl_split))
+                    syl_split = map(lambda x: x[:-1] + [x[-1] + u">"],
+                                    map(lambda x: [u"<" + x[0]] + x[1:], syl_split))
                     comb_syl_split = map(lambda x: ["".join(x[i:i + SYL])
                                                     for i in
                                                     range(max(len(x) - SYL + 1,
@@ -99,7 +100,8 @@ def build_data_cv(dataset, cv=10, clean_string=True):
                                     if (len(x) > 1 and len(en.syllables(x)) > 0)
                                     else [x],
                                     words)
-                    syl_split = map(lambda x: x[:-1] + [x[-1] + u">"], map(lambda x: [u"<" + x[0]] + x[1:], syl_split))
+                    syl_split = map(lambda x: x[:-1] + [x[-1] + u">"],
+                                    map(lambda x: [u"<" + x[0]] + x[1:], syl_split))
                     comb_syl_split = map(lambda x: ["".join(x[i:i + SYL])
                                                     for i in
                                                     range(max(len(x) - SYL + 1,
@@ -226,7 +228,8 @@ def build_data_cv(dataset, cv=10, clean_string=True):
                                     if (len(x) > 1 and len(hi.syllabify_hi(x)) > 0)
                                     else [x],
                                     words)
-                    syl_split = map(lambda x: x[:-1] + [x[-1] + u">"], map(lambda x: [u"<" + x[0]] + x[1:], syl_split))
+                    syl_split = map(lambda x: x[:-1] + [x[-1] + u">"],
+                                    map(lambda x: [u"<" + x[0]] + x[1:], syl_split))
                     comb_syl_split = map(lambda x: ["".join(x[i:i + SYL])
                                                     for i in
                                                     range(max(len(x) - SYL + 1,
@@ -299,14 +302,16 @@ def build_data_cv(dataset, cv=10, clean_string=True):
                                         if (len(x) > 1 and len(en.syllables(x)) > 0)
                                         else [x],
                                         words)
-                        syl_split = map(lambda x: x[:-1] + [x[-1] + u">"], map(lambda x: [u"<" + x[0]] + x[1:], syl_split))
+                        syl_split = map(lambda x: x[:-1] + [x[-1] + u">"],
+                                        map(lambda x: [u"<" + x[0]] + x[1:], syl_split))
                     else:
                         hi = Syllabifier()
                         syl_split = map(lambda x: hi.syllabify_hi(x)
                                         if (len(x) > 1 and len(hi.syllabify_hi(x)) > 0)
                                         else [x],
                                         words)
-                        syl_split = map(lambda x: x[:-1] + [x[-1] + u">"], map(lambda x: [u"<" + x[0]] + x[1:], syl_split))
+                        syl_split = map(lambda x: x[:-1] + [x[-1] + u">"],
+                                        map(lambda x: [u"<" + x[0]] + x[1:], syl_split))
                     comb_syl_split = map(lambda x: ["".join(x[i:i + SYL])
                                                     for i in
                                                     range(max(len(x) - SYL + 1,
