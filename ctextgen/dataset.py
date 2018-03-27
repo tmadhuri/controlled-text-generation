@@ -127,9 +127,8 @@ class WikiText_Dataset:
 
 
 class MyDataset:
-    def __init__(self, dataset, emb='rand', emb_dim=300,
-                 tokenizer='spacy', ngrams=1,
-                 mbsize=50, language='en', max_filter_size=5):
+    def __init__(self, dataset, emb='rand', emb_dim=300, tokenizer='spacy',
+                 ngrams=1, mbsize=50, language='en', max_filter_size=5):
         self.TEXT = data.Field(init_token='<start>', eos_token='<eos>',
                                lower=True,
                                tokenize=utils.getTokenizer(tokenizer, ngrams,
@@ -189,53 +188,44 @@ class MyDataset:
 
 
 class MR_Dataset(MyDataset):
-    def __init__(self, dataset, emb='rand', emb_dim=300,
-                 tokenizer='spacy', ngrams=1,
-                 mbsize=50, language='en', max_filter_size=5):
+    def __init__(self, emb='rand', emb_dim=300, tokenizer='spacy', ngrams=1,
+                 mbsize=50, max_filter_size=5):
         super(MR_Dataset, self).__init__("MR", emb=emb, emb_dim=emb_dim,
                                          tokenizer=tokenizer, ngrams=ngrams,
-                                         language=language, max_filter_size=5)
+                                         language='en', max_filter_size=5)
 
 
 class TeSA_Dataset(MyDataset):
-    def __init__(self, dataset, emb='rand', emb_dim=300,
-                 tokenizer='word', ngrams=1,
-                 mbsize=50, language='te', max_filter_size=5):
+    def __init__(self, emb='rand', emb_dim=300, tokenizer='word', ngrams=1,
+                 mbsize=50, max_filter_size=5):
         super(TeSA_Dataset, self).__init__("TeSA", emb=emb, emb_dim=emb_dim,
                                            tokenizer=tokenizer, ngrams=ngrams,
-                                           language=language,
-                                           max_filter_size=5)
+                                           language='te', max_filter_size=5)
 
 
 class HiSA_Dataset(MyDataset):
-    def __init__(self, dataset, emb='rand', emb_dim=300,
-                 tokenizer='word', ngrams=1,
-                 mbsize=50, language='hi', max_filter_size=5):
+    def __init__(self, emb='rand', emb_dim=300, tokenizer='word', ngrams=1,
+                 mbsize=50, max_filter_size=5):
         super(HiSA_Dataset, self).__init__("HiSA", emb=emb, emb_dim=emb_dim,
                                            tokenizer=tokenizer, ngrams=ngrams,
-                                           language=language,
-                                           max_filter_size=5)
+                                           language='hi', max_filter_size=5)
 
 
 class TrecEn_Dataset(MyDataset):
-    def __init__(self, dataset, emb='rand', emb_dim=300,
-                 tokenizer='spacy', ngrams=1,
-                 mbsize=50, language='en', max_filter_size=5):
+    def __init__(self, emb='rand', emb_dim=300, tokenizer='spacy', ngrams=1,
+                 mbsize=50, max_filter_size=5):
         super(TrecEn_Dataset, self).__init__("TREC-En", emb=emb,
                                              emb_dim=emb_dim,
                                              tokenizer=tokenizer,
                                              ngrams=ngrams,
-                                             language=language,
-                                             max_filter_size=5)
+                                             language='en', max_filter_size=5)
 
 
 class TrecHi_Dataset(MyDataset):
-    def __init__(self, dataset, emb='rand', emb_dim=300,
-                 tokenizer='word', ngrams=1,
-                 mbsize=50, language='hi', max_filter_size=5):
+    def __init__(self, emb='rand', emb_dim=300, tokenizer='word', ngrams=1,
+                 mbsize=50, max_filter_size=5):
         super(TrecHi_Dataset, self).__init__("TREC-Hi", emb=emb,
                                              emb_dim=emb_dim,
                                              tokenizer=tokenizer,
                                              ngrams=ngrams,
-                                             language=language,
-                                             max_filter_size=5)
+                                             language='hi', max_filter_size=5)

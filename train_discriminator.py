@@ -1,13 +1,8 @@
-
 import math
 import os
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
-import torch.autograd as autograd
 import torch.optim as optim
-import numpy as np
-from torch.autograd import Variable
 
 from ctextgen.dataset import SST_Dataset, MR_Dataset
 from ctextgen.model import RNN_VAE
@@ -58,7 +53,8 @@ args = parser.parse_args()
 dataset = args.dataset(tokenizer=args.tokenizer,
                        ngrams=args.ngrams,
                        emb=args.embeddings,
-                       emb_dim=args.dimension)
+                       emb_dim=args.dimension,
+                       max_filter_size=5)
 
 
 mbsize = 20
@@ -129,7 +125,8 @@ def main():
         loss_D = loss_s + lambda_u*loss_u
 
         loss_D.backward()
-        grad_norm = torch.nn.utils.clip_grad_norm(model.discriminator_params, 5)
+        grad_norm = torch.nn.utils.clip_grad_norm(model.discriminator_params,
+                                                  5)
         trainer_D.step()
         trainer_D.zero_grad()
 
@@ -137,7 +134,10 @@ def main():
         # Forward VAE with c ~ q(c|x) instead of from prior
         recon_loss, kl_loss = model.forward(inputs, use_c_prior=False)
         # x_gen: mbsize x seq_len x emb_dim
-        x_gen_attr, target_z, target_c = model.generate_soft_embed(batch_size, temp=temp(it))
+        x_gen_attr, target_z, target_c = model.generate_soft_embed(batch_size,
+                                                                   temp=temp(
+                                                                            it)
+                                                                   )
 
         # y_z: mbsize x z_dim
         y_z, _ = model.forward_encoder_embed(x_gen_attr.transpose(0, 1))

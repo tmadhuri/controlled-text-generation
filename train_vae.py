@@ -1,13 +1,6 @@
-
-import math
 import os
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.autograd as autograd
 import torch.optim as optim
-import numpy as np
-from torch.autograd import Variable
 
 from ctextgen.dataset import SST_Dataset, MR_Dataset
 from ctextgen.model import RNN_VAE
@@ -16,7 +9,8 @@ import argparse
 
 
 parser = argparse.ArgumentParser(
-    description='Conditional Text Generation: Train VAE as in Bowman, 2016, with c ~ p(c)'
+    description='Conditional Text Generation: Train VAE as in Bowman, 2016, \
+                 with c ~ p(c)'
 )
 
 parser.add_argument('--gpu', default=False, action='store_true',
@@ -57,7 +51,8 @@ args = parser.parse_args()
 dataset = args.dataset(tokenizer=args.tokenizer,
                        ngrams=args.ngrams,
                        emb=args.embeddings,
-                       emb_dim=args.dimension)
+                       emb_dim=args.dimension,
+                       max_filter_size=5)
 
 
 mb_size = 32
@@ -108,8 +103,10 @@ def main():
             sample_idxs = model.sample_sentence(z, c)
             sample_sent = dataset.idxs2sentence(sample_idxs)
 
-            print('Iter-{}; Loss: {:.4f}; Recon: {:.4f}; KL: {:.4f}; Grad_norm: {:.4f};'
-                  .format(it, loss.data[0], recon_loss.data[0], kl_loss.data[0], grad_norm))
+            print('Iter-{}; Loss: {:.4f}; Recon: {:.4f}; KL: {:.4f}; \
+                   Grad_norm: {:.4f};'
+                  .format(it, loss.data[0], recon_loss.data[0],
+                          kl_loss.data[0], grad_norm))
 
             print('Sample: "{}"'.format(sample_sent))
             print()
