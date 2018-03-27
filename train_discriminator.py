@@ -4,7 +4,9 @@ import torch
 import torch.nn.functional as F
 import torch.optim as optim
 
-from ctextgen.dataset import SST_Dataset, MR_Dataset
+from ctextgen.dataset import SST_Dataset
+from ctextgen.dataset import MR_Dataset, TeSA_Dataset, HiSA_Dataset
+from ctextgen.dataset import TrecEn_Dataset, TrecHi_Dataset
 from ctextgen.model import RNN_VAE
 
 import argparse
@@ -23,6 +25,10 @@ parser.add_argument('--save', default=False, action='store_true',
 datasets = {
     'sst': SST_Dataset,
     'mr': MR_Dataset,
+    'tesa': TeSA_Dataset,
+    'hisa': HiSA_Dataset,
+    'trec-en': TrecEn_Dataset,
+    'trec-hi': TrecHi_Dataset
 }
 
 parser.add_argument('--dataset', type=lambda d: datasets[d.lower()],
@@ -57,9 +63,9 @@ dataset = args.dataset(tokenizer=args.tokenizer,
                        max_filter_size=5)
 
 
-mbsize = 20
+mbsize = 50
 z_dim = 20
-h_dim = 64
+h_dim = 300
 lr = 1e-3
 lr_decay_every = 1000000
 n_iter = 100

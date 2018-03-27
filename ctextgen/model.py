@@ -71,7 +71,7 @@ class RNN_VAE(nn.Module):
 
         self.disc_fc = nn.Sequential(
             nn.Dropout(0.5),
-            nn.Linear(300, 2)
+            nn.Linear(300, self.c_dim)
         )
 
         self.discriminator = nn.ModuleList([
@@ -144,7 +144,7 @@ class RNN_VAE(nn.Module):
         Sample c ~ p(c) = Cat([0.5, 0.5])
         """
         c = Variable(
-            torch.from_numpy(np.random.multinomial(1, [0.5, 0.5], mbsize).astype('float32'))
+            torch.from_numpy(np.random.multinomial(1, [1.0 / self.c_dim] * self.c_dim, mbsize).astype('float32'))
         )
         c = c.cuda() if self.gpu else c
         return c
