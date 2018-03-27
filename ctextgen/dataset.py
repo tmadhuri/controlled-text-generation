@@ -135,10 +135,12 @@ class MR_Dataset:
         self.LABEL = data.Field(sequential=False, unk_token=None,
                                 use_vocab=False)
 
+        f = lambda ex: len(ex.text) > 5
+
         train, test = data.TabularDataset.splits(
             fields=[('text', self.TEXT), ('label', self.LABEL)],
             path=".data/MR/0/", train="train.txt",
-            test="test.txt", format="tsv"
+            test="test.txt", format="tsv", filter_pred=f
         )
 
         random.seed(1245)
@@ -167,8 +169,6 @@ class MR_Dataset:
 
         if gpu:
             return batch.text.cuda(), batch.label.cuda()
-
-        print(batch.text, len(batch.text))
 
         return batch.text, batch.label
 
