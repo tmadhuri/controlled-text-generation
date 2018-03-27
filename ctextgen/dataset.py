@@ -130,7 +130,8 @@ class MR_Dataset:
                  mbsize=32):
         self.TEXT = data.Field(init_token='<start>', eos_token='<eos>',
                                lower=True,
-                               tokenize=utils.getTokenizer(tokenizer, ngrams))
+                               tokenize=utils.getTokenizer(tokenizer, ngrams,
+                                                           'en'))
         self.LABEL = data.Field(sequential=False, unk_token=None,
                                 use_vocab=False)
 
@@ -141,7 +142,8 @@ class MR_Dataset:
         )
 
         random.seed(1245)
-        train, val = train.split(0.9, stratified=False, strata_field='label', random_state=random.getstate())
+        train, val = train.split(0.9, stratified=False, strata_field='label',
+                                 random_state=random.getstate())
 
         self.TEXT.build_vocab(train,
                               vectors=utils.getEmbeddings(emb,
