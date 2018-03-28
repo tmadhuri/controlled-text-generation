@@ -145,8 +145,8 @@ def main():
         loss_D = loss_s + lambda_u*loss_u
 
         loss_D.backward()
-        grad_norm = torch.nn.utils.clip_grad_norm(model.discriminator_params,
-                                                  5)
+        # grad_norm = torch.nn.utils.clip_grad_norm(model.discriminator_params,
+        #                                           5)
         trainer_D.step()
         trainer_D.zero_grad()
 
