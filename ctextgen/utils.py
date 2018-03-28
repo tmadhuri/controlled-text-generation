@@ -84,6 +84,6 @@ def sort_key(ex):
 
 def filter(max_filter_size):
     def filter_pred(ex):
-        return ((len(ex.text) > max_filter_size) and (len(ex.text) <= 15))
+        return ((len(ex.text) > max_filter_size) and (len(ex.text) <= 25))
 
     return filter_pred
