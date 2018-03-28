@@ -9,12 +9,17 @@ from itertools import chain
 class RNN_VAE(nn.Module):
     """
     1. Hu, Zhiting, et al. "Toward controlled generation of text." ICML. 2017.
-    2. Bowman, Samuel R., et al. "Generating sentences from a continuous space." arXiv preprint arXiv:1511.06349 (2015).
-    3. Kim, Yoon. "Convolutional neural networks for sentence classification." arXiv preprint arXiv:1408.5882 (2014).
+    2. Bowman, Samuel R., et al.
+       "Generating sentences from a continuous space."
+       arXiv preprint arXiv:1511.06349 (2015).
+    3. Kim, Yoon.
+       "Convolutional neural networks for sentence classification."
+       arXiv preprint arXiv:1408.5882 (2014).
     """
 
     def __init__(self, n_vocab, h_dim, z_dim, c_dim, p_word_dropout=0.3,
                  unk_idx=0, pad_idx=1, start_idx=2, eos_idx=3, max_sent_len=25,
+                 cnn_filters=[3, 4, 5], cnn_units=100,
                  pretrained_embeddings=None, freeze_embeddings=False,
                  gpu=False):
         super(RNN_VAE, self).__init__()
@@ -59,27 +64,28 @@ class RNN_VAE(nn.Module):
         """
         Decoder is GRU with `z` and `c` appended at its inputs
         """
-        self.decoder = nn.GRU(self.emb_dim+z_dim+c_dim, z_dim+c_dim, dropout=0.3)
+        self.decoder = nn.GRU(self.emb_dim+z_dim+c_dim, z_dim+c_dim,
+                              dropout=0.3)
         self.decoder_fc = nn.Linear(z_dim+c_dim, n_vocab)
 
         """
         Discriminator is CNN as in Kim, 2014
         """
-        self.conv3 = nn.Conv2d(1, 100, (3, self.emb_dim))
-        self.conv4 = nn.Conv2d(1, 100, (4, self.emb_dim))
-        self.conv5 = nn.Conv2d(1, 100, (5, self.emb_dim))
+        self.conv = [nn.Conv2d(1, cnn_units, (sz, self.emb_dim))
+                     for sz in cnn_filters]
 
         self.disc_fc = nn.Sequential(
             nn.Dropout(0.5),
-            nn.Linear(300, self.c_dim)
+            nn.Linear(cnn_units * len(cnn_filters), self.c_dim)
         )
 
         self.discriminator = nn.ModuleList([
-            self.conv3, self.conv4, self.conv5, self.disc_fc
+            self.conv, self.disc_fc
         ])
 
         """
-        Grouping the model's parameters: separating encoder, decoder, and discriminator
+        Grouping the model's parameters: separating encoder, decoder,
+        and discriminator
         """
         self.encoder_params = chain(
             self.encoder.parameters(), self.q_mu.parameters(),
@@ -91,11 +97,13 @@ class RNN_VAE(nn.Module):
         )
 
         self.vae_params = chain(
-            self.word_emb.parameters(), self.encoder_params, self.decoder_params
+            self.word_emb.parameters(), self.encoder_params,
+            self.decoder_params
         )
         self.vae_params = filter(lambda p: p.requires_grad, self.vae_params)
 
-        self.discriminator_params = filter(lambda p: p.requires_grad, self.discriminator.parameters())
+        self.discriminator_params = filter(lambda p: p.requires_grad,
+                                           self.discriminator.parameters())
 
         """
         Use GPU if set
@@ -144,7 +152,10 @@ class RNN_VAE(nn.Module):
         Sample c ~ p(c) = Cat([0.5, 0.5])
         """
         c = Variable(
-            torch.from_numpy(np.random.multinomial(1, [1.0 / self.c_dim] * self.c_dim, mbsize).astype('float32'))
+            torch.from_numpy(
+                np.random.multinomial(1,
+                                      [1.0 / self.c_dim] * self.c_dim,
+                                      mbsize).astype('float32'))
         )
         c = c.cuda() if self.gpu else c
         return c
@@ -185,18 +196,14 @@ class RNN_VAE(nn.Module):
         """
         inputs = inputs.unsqueeze(1)  # mbsize x 1 x seq_len x emb_dim
 
-        x3 = F.relu(self.conv3(inputs)).squeeze()
-        x4 = F.relu(self.conv4(inputs)).squeeze()
-        x5 = F.relu(self.conv5(inputs)).squeeze()
+        X = [F.relu(cv(inputs)).squeeze() for cv in self.conv]
 
         # Max-over-time-pool
-        x3 = F.max_pool1d(x3, x3.size(2)).squeeze()
-        x4 = F.max_pool1d(x4, x4.size(2)).squeeze()
-        x5 = F.max_pool1d(x5, x5.size(2)).squeeze()
+        X = [F.max_pool1d(x, x.size(2)).squeeze() for x in X]
 
-        x = torch.cat([x3, x4, x5], dim=1)
+        X = torch.cat(X, dim=1)
 
-        y = self.disc_fc(x)
+        y = self.disc_fc(X)
 
         return y
 
@@ -219,7 +226,8 @@ class RNN_VAE(nn.Module):
         # sentence: '<start> I want to fly <eos>'
         # enc_inputs: 'I want to fly'
         # dec_targets: 'I want to fly <eos> <pad>'
-        pad_words = Variable(torch.LongTensor([self.PAD_IDX])).repeat(1, mbsize)
+        pad_words = Variable(torch.LongTensor([self.PAD_IDX])).repeat(1,
+                                                                      mbsize)
         pad_words = pad_words.cuda() if self.gpu else pad_words
 
         enc_inputs = sentence[1:-1, :]
@@ -240,7 +248,8 @@ class RNN_VAE(nn.Module):
         recon_loss = F.cross_entropy(
             y.view(-1, self.n_vocab), dec_targets.view(-1), size_average=True
         )
-        kl_loss = torch.mean(0.5 * torch.sum(torch.exp(logvar) + mu**2 - 1 - logvar, 1))
+        kl_loss = torch.mean(0.5 * torch.sum(torch.exp(logvar)
+                             + mu**2 - 1 - logvar, 1))
 
         return recon_loss, kl_loss
 
@@ -395,7 +404,8 @@ class RNN_VAE(nn.Module):
 
         # Sample masks: elems with val 1 will be set to <unk>
         mask = torch.from_numpy(
-            np.random.binomial(1, p=self.p_word_dropout, size=tuple(data.size()))
+            np.random.binomial(1, p=self.p_word_dropout,
+                               size=tuple(data.size()))
                      .astype('uint8')
         )
 

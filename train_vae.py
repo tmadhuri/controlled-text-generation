@@ -6,6 +6,7 @@ from ctextgen.dataset import SST_Dataset
 from ctextgen.dataset import MR_Dataset, TeSA_Dataset, HiSA_Dataset
 from ctextgen.dataset import TrecEn_Dataset, TrecHi_Dataset
 from ctextgen.model import RNN_VAE
+from ctextgen import utils
 
 import argparse
 
@@ -48,8 +49,18 @@ parser.add_argument('-e', '--embeddings', type=str,
 parser.add_argument('-d', '--dimension', type=int, default=300,
                     help='Size of embedding vector')
 
+parser.add_argument('--freeze_emb', default=False, action='store_true',
+                    help='Whether to freeze embeddings while training.')
+
 parser.add_argument('-c', '--num_classes', type=int, default=3,
                     help='Number of Classes in Dataset.')
+
+parser.add_argument('-f', '--filters', type=int, default=3,
+                    nargs='+',
+                    help='Filters for the discriminator.')
+
+parser.add_argument('-u', '--units', type=int, default=100,
+                    help='Number of filters in discriminator.')
 
 args = parser.parse_args()
 
@@ -58,12 +69,12 @@ dataset = args.dataset(tokenizer=args.tokenizer,
                        ngrams=args.ngrams,
                        emb=args.embeddings,
                        emb_dim=args.dimension,
-                       max_filter_size=5)
+                       max_filter_size=max(args.filters))
 
 
 mb_size = 50
 z_dim = 20
-h_dim = 300
+h_dim = args.dimension
 lr = 1e-3
 lr_decay_every = 1000000
 n_iter = 500
@@ -73,8 +84,9 @@ c_dim = args.num_classes
 
 model = RNN_VAE(
     dataset.n_vocab, h_dim, z_dim, c_dim, p_word_dropout=0.3,
-    pretrained_embeddings=dataset.get_vocab_vectors(), freeze_embeddings=False,
-    gpu=args.gpu
+    pretrained_embeddings=dataset.get_vocab_vectors(),
+    cnn_filters=args.filters, cnn_units=args.units,
+    freeze_embeddings=args.freeze_emb, gpu=args.gpu
 )
 
 
@@ -127,7 +139,8 @@ def save_model():
     if not os.path.exists('models/'):
         os.makedirs('models/')
 
-    torch.save(model.state_dict(), 'models/vae.bin')
+    torch.save(model.state_dict(), ('models/vae' + utils.getModelName(args)
+                                    + '.bin'))
 
 
 if __name__ == '__main__':

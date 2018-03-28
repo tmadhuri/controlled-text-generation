@@ -13,12 +13,9 @@ class SST_Dataset:
                                lower=True, tokenize='spacy', fix_length=16)
         self.LABEL = data.Field(sequential=False, unk_token=None)
 
-        # Only take sentences with length <= 15
-        f = lambda ex: len(ex.text) <= 15 and ex.label != 'neutral'
-
         train, val, test = datasets.SST.splits(
             self.TEXT, self.LABEL, fine_grained=False, train_subtrees=False,
-            filter_pred=f
+            filter_pred=utils.filter(6)
         )
 
         self.TEXT.build_vocab(train, vectors=FastText('en'))
@@ -64,11 +61,8 @@ class IMDB_Dataset:
                                lower=True, tokenize='spacy', fix_length=None)
         self.LABEL = data.Field(sequential=False, unk_token=None)
 
-        # Only take sentences with length <= 15
-        f = lambda ex: len(ex.text) <= 15
-
         train, test = datasets.IMDB.splits(
-            self.TEXT, self.LABEL, filter_pred=f
+            self.TEXT, self.LABEL, filter_pred=utils.filter(6)
         )
 
         self.TEXT.build_vocab(train, vectors=GloVe('6B', dim=emb_dim))
