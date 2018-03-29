@@ -123,4 +123,11 @@ TREC-En/
 TREC-Hi/
 
 run.sh
+mr_word.sh
+tesa_word.sh
+hisa_word.sh
+trec_en_word.sh
+trec_hi_word.sh
 *.p
+
+*.bin

@@ -18,7 +18,7 @@ class RNN_VAE(nn.Module):
     """
 
     def __init__(self, n_vocab, h_dim, z_dim, c_dim, p_word_dropout=0.3,
-                 unk_idx=0, pad_idx=1, start_idx=2, eos_idx=3, max_sent_len=25,
+                 unk_idx=0, pad_idx=1, start_idx=2, eos_idx=3, max_sent_len=15,
                  cnn_filters=[3, 4, 5], cnn_units=100,
                  pretrained_embeddings=None, freeze_embeddings=False,
                  gpu=False):
@@ -79,8 +79,8 @@ class RNN_VAE(nn.Module):
             nn.Linear(cnn_units * len(cnn_filters), self.c_dim)
         )
 
-        self.discriminator = nn.ModuleList([
-            self.conv, self.disc_fc
+        self.discriminator = nn.ModuleList(self.conv + [
+            self.disc_fc
         ])
 
         """

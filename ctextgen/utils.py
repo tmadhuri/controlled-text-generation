@@ -84,17 +84,19 @@ def sort_key(ex):
 
 def filter(max_filter_size):
     def filter_pred(ex):
-        return ((len(ex.text) > max_filter_size) and (len(ex.text) <= 25))
+        return ((len(ex.text) > max_filter_size) and (len(ex.text) <= 15))
 
     return filter_pred
 
 
 def getModelName(params):
-    modelName = ("_" + params.dataset + "_t" + params.tokenizer
-                 + "_n" + str(params.ngrams) + "_e" + params.embeddings
-                 + "_d" + str(params.dimension)
-                 + "_c" + str(params.num_classes) + "_f" + str(params.filters)
-                 + "_u" + str(params.units))
+    modelName = "".join(["_", params.dataset.__name__,
+                         "_t", params.tokenizer,
+                         "_n", str(params.ngrams),
+                         "_e", params.embeddings,
+                         "_d", str(params.dimension),
+                         "_f", str(params.filters),
+                         "_u", str(params.units)])
 
     if params.freeze_emb:
         modelName += "_freeze"

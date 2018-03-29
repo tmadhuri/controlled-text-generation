@@ -41,7 +41,7 @@ parser.add_argument('-n', '--ngrams', type=int, default=1,
                     help='Size of ngrams')
 
 parser.add_argument('-e', '--embeddings', type=str,
-                    choices=['Glove', 'word2vec', 'FastText', 'FastTextOOV'],
+                    choices=['Glove', 'word2vec', 'FastText', 'FastTextOOV', 'rand'],
                     default='rand',
                     help='Which embeddings to use.')
 
@@ -99,7 +99,7 @@ else:
                                      map_location=lambda storage, loc: storage)
                           )
 
-outputFile = open("gen" + utils.getModelName(args) + ".out.txt", "w+")
+outputFile = open("models/gen" + utils.getModelName(args) + ".out.txt", "w+")
 
 for i in range(n_iter):
     # Samples latent and conditional codes randomly from prior

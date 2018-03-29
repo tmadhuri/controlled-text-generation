@@ -44,7 +44,7 @@ parser.add_argument('-n', '--ngrams', type=int, default=1,
                     help='Size of ngrams')
 
 parser.add_argument('-e', '--embeddings', type=str,
-                    choices=['Glove', 'word2vec', 'FastText', 'FastTextOOV'],
+                    choices=['Glove', 'word2vec', 'FastText', 'FastTextOOV', 'rand'],
                     default='rand',
                     help='Which embeddings to use.')
 
@@ -79,7 +79,7 @@ z_dim = 20
 h_dim = args.dimension
 lr = 1e-3
 lr_decay_every = 1000000
-n_iter = 100
+n_iter = 5000
 log_interval = 100
 z_dim = h_dim
 c_dim = args.num_classes

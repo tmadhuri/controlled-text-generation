@@ -186,7 +186,7 @@ class MR_Dataset(MyDataset):
                  mbsize=50, max_filter_size=5):
         super(MR_Dataset, self).__init__("MR", emb=emb, emb_dim=emb_dim,
                                          tokenizer=tokenizer, ngrams=ngrams,
-                                         language='en', max_filter_size=5)
+                                         language='en', max_filter_size=max_filter_size)
 
 
 class TeSA_Dataset(MyDataset):
@@ -194,7 +194,7 @@ class TeSA_Dataset(MyDataset):
                  mbsize=50, max_filter_size=5):
         super(TeSA_Dataset, self).__init__("TeSA", emb=emb, emb_dim=emb_dim,
                                            tokenizer=tokenizer, ngrams=ngrams,
-                                           language='te', max_filter_size=5)
+                                           language='te', max_filter_size=max_filter_size)
 
 
 class HiSA_Dataset(MyDataset):
@@ -202,7 +202,7 @@ class HiSA_Dataset(MyDataset):
                  mbsize=50, max_filter_size=5):
         super(HiSA_Dataset, self).__init__("HiSA", emb=emb, emb_dim=emb_dim,
                                            tokenizer=tokenizer, ngrams=ngrams,
-                                           language='hi', max_filter_size=5)
+                                           language='hi', max_filter_size=max_filter_size)
 
 
 class TrecEn_Dataset(MyDataset):
@@ -212,7 +212,7 @@ class TrecEn_Dataset(MyDataset):
                                              emb_dim=emb_dim,
                                              tokenizer=tokenizer,
                                              ngrams=ngrams,
-                                             language='en', max_filter_size=5)
+                                             language='en', max_filter_size=max_filter_size)
 
 
 class TrecHi_Dataset(MyDataset):
@@ -222,4 +222,4 @@ class TrecHi_Dataset(MyDataset):
                                              emb_dim=emb_dim,
                                              tokenizer=tokenizer,
                                              ngrams=ngrams,
-                                             language='hi', max_filter_size=5)
+                                             language='hi', max_filter_size=max_filter_size)
