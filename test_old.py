@@ -6,6 +6,7 @@ from ctextgen.dataset import TrecEn_Dataset, TrecHi_Dataset
 from ctextgen.model import RNN_VAE
 from ctextgen import utils
 
+import numpy as np
 import argparse
 import time
 
