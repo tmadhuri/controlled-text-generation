@@ -85,6 +85,7 @@ torch.manual_seed(int(time.time()))
 model = RNN_VAE(
     dataset.n_vocab, h_dim, z_dim, c_dim, p_word_dropout=0.3,
     pretrained_embeddings=dataset.get_vocab_vectors(),
+    cnn_filters=args.filters, cnn_units=args.units,
     freeze_embeddings=args.freeze_emb, gpu=args.gpu
 )
 
