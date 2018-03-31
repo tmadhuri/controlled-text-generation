@@ -8,7 +8,8 @@ import random
 
 class SST_Dataset:
 
-    def __init__(self, emb_dim=50, mbsize=32):
+    def __init__(self, emb_dim=50, mbsize=50, main=True, dataset2=None,
+                 **kwargs):
         self.TEXT = data.Field(init_token='<start>', eos_token='<eos>',
                                lower=True, tokenize='spacy', fix_length=16)
         self.LABEL = data.Field(sequential=False, unk_token=None)
@@ -18,15 +19,20 @@ class SST_Dataset:
             filter_pred=utils.filter(6)
         )
 
-        self.TEXT.build_vocab(train, vectors=FastText('en'))
-        self.LABEL.build_vocab(train)
+        self.train = train
 
-        self.n_vocab = len(self.TEXT.vocab.itos)
-        self.emb_dim = emb_dim
+        if main:
+            train_datasets = [train, dataset2.get_train()] \
+                             if dataset2 else [train]
+            self.TEXT.build_vocab(*train_datasets, vectors=FastText('en'))
+            self.LABEL.build_vocab(train)
 
-        self.train_iter, self.val_iter, _ = data.BucketIterator.splits(
-            (train, val, test), batch_size=mbsize, device=-1, shuffle=True
-        )
+            self.n_vocab = len(self.TEXT.vocab.itos)
+            self.emb_dim = emb_dim
+
+            self.train_iter, self.val_iter, _ = data.BucketIterator.splits(
+                (train, val, test), batch_size=mbsize, device=-1, shuffle=True
+            )
 
     def get_vocab_vectors(self):
         return self.TEXT.vocab.vectors
@@ -53,10 +59,14 @@ class SST_Dataset:
     def idx2label(self, idx):
         return self.LABEL.vocab.itos[idx]
 
+    def get_train(self):
+        return self.train
+
 
 class IMDB_Dataset:
 
-    def __init__(self, emb_dim=50, mbsize=32):
+    def __init__(self, emb_dim=50, mbsize=50, main=True, dataset2=None,
+                 **kwargs):
         self.TEXT = data.Field(init_token='<start>', eos_token='<eos>',
                                lower=True, tokenize='spacy', fix_length=None)
         self.LABEL = data.Field(sequential=False, unk_token=None)
@@ -65,15 +75,21 @@ class IMDB_Dataset:
             self.TEXT, self.LABEL, filter_pred=utils.filter(6)
         )
 
-        self.TEXT.build_vocab(train, vectors=GloVe('6B', dim=emb_dim))
-        self.LABEL.build_vocab(train)
+        self.train = train
 
-        self.n_vocab = len(self.TEXT.vocab.itos)
-        self.emb_dim = emb_dim
+        if main:
+            train_datasets = [train, dataset2.get_train()] \
+                             if dataset2 else [train]
+            self.TEXT.build_vocab(*train_datasets,
+                                  vectors=GloVe('6B', dim=emb_dim))
+            self.LABEL.build_vocab(train)
 
-        self.train_iter, _ = data.BucketIterator.splits(
-            (train, test), batch_size=mbsize, device=-1, shuffle=True
-        )
+            self.n_vocab = len(self.TEXT.vocab.itos)
+            self.emb_dim = emb_dim
+
+            self.train_iter, _ = data.BucketIterator.splits(
+                (train, test), batch_size=mbsize, device=-1, shuffle=True
+            )
 
     def get_vocab_vectors(self):
         return self.TEXT.vocab.vectors
@@ -88,6 +104,9 @@ class IMDB_Dataset:
 
     def idxs2sentence(self, idxs):
         return ' '.join([self.TEXT.vocab.itos[i] for i in idxs])
+
+    def get_train(self):
+        return self.train
 
 
 class WikiText_Dataset:
@@ -121,8 +140,9 @@ class WikiText_Dataset:
 
 
 class MyDataset:
-    def __init__(self, dataset, emb='rand', emb_dim=300, tokenizer='spacy',
-                 ngrams=1, mbsize=50, language='en', max_filter_size=5):
+    def __init__(self, dataset, emb='rand', emb_dim=300, tokenizer='word',
+                 ngrams=1, mbsize=50, language='en', max_filter_size=5,
+                 main=True, dataset2=None):
         self.TEXT = data.Field(init_token='<start>', eos_token='<eos>',
                                lower=True,
                                tokenize=utils.getTokenizer(tokenizer, ngrams,
@@ -141,19 +161,24 @@ class MyDataset:
         train, val = train.split(0.9, stratified=False, strata_field='label',
                                  random_state=random.getstate())
 
-        self.TEXT.build_vocab(train,
-                              vectors=utils.getEmbeddings(emb,
-                                                          dim=emb_dim,
-                                                          language='en'))
-        self.LABEL.build_vocab(train)
+        self.train = train
 
-        self.n_vocab = len(self.TEXT.vocab.itos)
-        self.emb_dim = emb_dim
+        if main:
+            train_datasets = [train, dataset2.get_train()] \
+                             if dataset2 else [train]
+            self.TEXT.build_vocab(*train_datasets,
+                                  vectors=utils.getEmbeddings(emb,
+                                                              dim=emb_dim,
+                                                              language='en'))
+            self.LABEL.build_vocab(train)
 
-        self.train_iter, self.val_iter, _ = data.BucketIterator.splits(
-            (train, val, test), batch_size=mbsize, device=-1, shuffle=True,
-            sort_key=utils.sort_key
-        )
+            self.n_vocab = len(self.TEXT.vocab.itos)
+            self.emb_dim = emb_dim
+
+            self.train_iter, self.val_iter, _ = data.BucketIterator.splits(
+                (train, val, test), batch_size=mbsize, device=-1, shuffle=True,
+                sort_key=utils.sort_key
+            )
 
     def get_vocab_vectors(self):
         return self.TEXT.vocab.vectors
@@ -182,46 +207,32 @@ class MyDataset:
     def idx2label(self, idx):
         return self.LABEL.vocab.itos[idx]
 
+    def get_train(self):
+        return self.train
+
 
 class MR_Dataset(MyDataset):
-    def __init__(self, emb='rand', emb_dim=300, tokenizer='spacy', ngrams=1,
-                 mbsize=50, max_filter_size=5):
-        super(MR_Dataset, self).__init__("MR", emb=emb, emb_dim=emb_dim,
-                                         tokenizer=tokenizer, ngrams=ngrams,
-                                         language='en', max_filter_size=max_filter_size)
+    def __init__(self, **kwargs):
+        super(MR_Dataset, self).__init__("MR", language='en', **kwargs)
 
 
 class TeSA_Dataset(MyDataset):
-    def __init__(self, emb='rand', emb_dim=300, tokenizer='word', ngrams=1,
-                 mbsize=50, max_filter_size=5):
-        super(TeSA_Dataset, self).__init__("TeSA", emb=emb, emb_dim=emb_dim,
-                                           tokenizer=tokenizer, ngrams=ngrams,
-                                           language='te', max_filter_size=max_filter_size)
+    def __init__(self, **kwargs):
+        super(TeSA_Dataset, self).__init__("TeSA", language='te', **kwargs)
 
 
 class HiSA_Dataset(MyDataset):
-    def __init__(self, emb='rand', emb_dim=300, tokenizer='word', ngrams=1,
-                 mbsize=50, max_filter_size=5):
-        super(HiSA_Dataset, self).__init__("HiSA", emb=emb, emb_dim=emb_dim,
-                                           tokenizer=tokenizer, ngrams=ngrams,
-                                           language='hi', max_filter_size=max_filter_size)
+    def __init__(self, **kwargs):
+        super(HiSA_Dataset, self).__init__("HiSA", language='hi', **kwargs)
 
 
 class TrecEn_Dataset(MyDataset):
-    def __init__(self, emb='rand', emb_dim=300, tokenizer='spacy', ngrams=1,
-                 mbsize=50, max_filter_size=5):
-        super(TrecEn_Dataset, self).__init__("TREC-En", emb=emb,
-                                             emb_dim=emb_dim,
-                                             tokenizer=tokenizer,
-                                             ngrams=ngrams,
-                                             language='en', max_filter_size=max_filter_size)
+    def __init__(self, **kwargs):
+        super(TrecEn_Dataset, self).__init__("TREC-En", language='en',
+                                             **kwargs)
 
 
 class TrecHi_Dataset(MyDataset):
-    def __init__(self, emb='rand', emb_dim=300, tokenizer='word', ngrams=1,
-                 mbsize=50, max_filter_size=5):
-        super(TrecHi_Dataset, self).__init__("TREC-Hi", emb=emb,
-                                             emb_dim=emb_dim,
-                                             tokenizer=tokenizer,
-                                             ngrams=ngrams,
-                                             language='hi', max_filter_size=max_filter_size)
+    def __init__(self, **kwargs):
+        super(TrecHi_Dataset, self).__init__("TREC-Hi", language='hi',
+                                             **kwargs)

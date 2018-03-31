@@ -30,9 +30,13 @@ datasets = {
     'trec-hi': TrecHi_Dataset
 }
 
-parser.add_argument('--dataset', type=lambda d: datasets[d.lower()],
+parser.add_argument('dataset', type=lambda d: datasets[d.lower()],
                     choices=datasets.values(), required=True,
                     help='Dataset to be used.')
+
+parser.add_argument('-d2', '--dataset2', type=lambda d: datasets[d.lower()],
+                    choices=datasets.values(), required=True,
+                    help='2nd Dataset to be used.')
 
 parser.add_argument('-t', '--tokenizer', type=str,
                     choices=["char", "word", "syl", "spacy"], required=True,
@@ -42,7 +46,8 @@ parser.add_argument('-n', '--ngrams', type=int, default=1,
                     help='Size of ngrams')
 
 parser.add_argument('-e', '--embeddings', type=str,
-                    choices=['Glove', 'word2vec', 'FastText', 'FastTextOOV', 'rand'],
+                    choices=['Glove', 'word2vec', 'FastText', 'FastTextOOV',
+                             'rand'],
                     default='rand',
                     help='Which embeddings to use.')
 
@@ -65,11 +70,19 @@ parser.add_argument('-u', '--units', type=int, default=100,
 args = parser.parse_args()
 
 
+dataset2 = args.dataset2(tokenizer=args.tokenizer,
+                         ngrams=args.ngrams,
+                         emb=args.embeddings,
+                         emb_dim=args.dimension,
+                         max_filter_size=max(args.filters),
+                         main=False)
+
 dataset = args.dataset(tokenizer=args.tokenizer,
                        ngrams=args.ngrams,
                        emb=args.embeddings,
                        emb_dim=args.dimension,
-                       max_filter_size=max(args.filters))
+                       max_filter_size=max(args.filters),
+                       dataset2=dataset2)
 
 
 mb_size = 50
@@ -88,6 +101,10 @@ model = RNN_VAE(
     cnn_filters=args.filters, cnn_units=args.units,
     freeze_embeddings=args.freeze_emb, gpu=args.gpu
 )
+
+if os.path.exists('models/vae' + utils.getModelName(args) + '.bin'):
+    model.load_state_dict(torch.load('models/vae' + utils.getModelName(args)
+                                     + '.bin'))
 
 
 def main():
