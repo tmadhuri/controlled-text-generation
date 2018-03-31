@@ -20,6 +20,8 @@ parser.add_argument('--gpu', default=False, action='store_true',
                     help='whether to run in the GPU')
 parser.add_argument('--save', default=False, action='store_true',
                     help='whether to save model or not')
+parser.add_argument('--use_saved', default=False, action='store_true',
+                    help='whether to use saved model or not')
 
 datasets = {
     'sst': SST_Dataset,
@@ -85,9 +87,9 @@ dataset = args.dataset(tokenizer=args.tokenizer,
                        dataset2=dataset2)
 
 
-mb_size = 50
+mb_size = 32
 z_dim = 20
-h_dim = args.dimension
+h_dim = 64
 lr = 1e-3
 lr_decay_every = 1000000
 n_iter = 20000
@@ -102,7 +104,7 @@ model = RNN_VAE(
     freeze_embeddings=args.freeze_emb, gpu=args.gpu
 )
 
-if os.path.exists('models/vae' + utils.getModelName(args) + '.bin'):
+if args.use_saved:
     model.load_state_dict(torch.load('models/vae' + utils.getModelName(args)
                                      + '.bin'))
 
@@ -156,8 +158,13 @@ def save_model():
     if not os.path.exists('models/'):
         os.makedirs('models/')
 
-    torch.save(model.state_dict(), ('models/vae' + utils.getModelName(args)
-                                    + '.bin'))
+    if args.use_saved:
+        torch.save(model.state_dict(), ('models/vae' + utils.getModelName(args)
+                                        + '.bin'))
+    else:
+        torch.save(model.state_dict(), ('models/vae'
+                                        + utils.getModelName(args, 'd2')
+                                        + '.bin'))
 
 
 if __name__ == '__main__':

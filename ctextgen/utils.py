@@ -89,14 +89,23 @@ def filter(max_filter_size):
     return filter_pred
 
 
-def getModelName(params):
-    modelName = "".join(["_", params.dataset.__name__,
-                         "_t", params.tokenizer,
-                         "_n", str(params.ngrams),
-                         "_e", params.embeddings,
-                         "_d", str(params.dimension),
-                         "_f", str(params.filters),
-                         "_u", str(params.units)])
+def getModelName(params, d):
+    if d == 'd2':
+        modelName = "".join(["_", params.dataset2.__name__,
+                             "_t", params.tokenizer,
+                             "_n", str(params.ngrams),
+                             "_e", params.embeddings,
+                             "_d", str(params.dimension),
+                             "_f", str(params.filters),
+                             "_u", str(params.units)])
+    else:
+        modelName = "".join(["_", params.dataset.__name__,
+                             "_t", params.tokenizer,
+                             "_n", str(params.ngrams),
+                             "_e", params.embeddings,
+                             "_d", str(params.dimension),
+                             "_f", str(params.filters),
+                             "_u", str(params.units)])
 
     if params.freeze_emb:
         modelName += "_freeze"

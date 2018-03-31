@@ -74,9 +74,9 @@ dataset = args.dataset(tokenizer=args.tokenizer,
                        max_filter_size=max(args.filters))
 
 
-mbsize = 50
+mbsize = 20
 z_dim = 20
-h_dim = args.dimension
+h_dim = 64
 lr = 1e-3
 lr_decay_every = 1000000
 n_iter = 5000

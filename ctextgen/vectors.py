@@ -60,6 +60,6 @@ class FastText(Ftxt):
 
 
 class GloVe(Glv):
-    def __init__(self, dim=300, name="42B", **kwargs):
+    def __init__(self, dim=50, name="6B", **kwargs):
         super(GloVe, self).__init__(name=name, dim=dim,
                                     cache="/home/srishti/vector_cache")
