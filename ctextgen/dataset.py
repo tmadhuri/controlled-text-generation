@@ -160,6 +160,8 @@ class MyDataset:
 
     def next_batch(self, gpu=False):
         batch = next(iter(self.train_iter))
+        if batch.batch_size == 1:
+            batch = next(iter(self.train_iter))
 
         if gpu:
             return batch.text.cuda(), batch.label.cuda()
