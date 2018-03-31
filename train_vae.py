@@ -2,7 +2,7 @@ import os
 import torch
 import torch.optim as optim
 
-from ctextgen.dataset import SST_Dataset
+from ctextgen.dataset import SST_Dataset, IMDB_Dataset
 from ctextgen.dataset import MR_Dataset, TeSA_Dataset, HiSA_Dataset
 from ctextgen.dataset import TrecEn_Dataset, TrecHi_Dataset
 from ctextgen.model import RNN_VAE
@@ -29,11 +29,12 @@ datasets = {
     'tesa': TeSA_Dataset,
     'hisa': HiSA_Dataset,
     'trec-en': TrecEn_Dataset,
-    'trec-hi': TrecHi_Dataset
+    'trec-hi': TrecHi_Dataset,
+    'imdb': IMDB_Dataset
 }
 
 parser.add_argument('dataset', type=lambda d: datasets[d.lower()],
-                    choices=datasets.values(), required=True,
+                    choices=datasets.values(),
                     help='Dataset to be used.')
 
 parser.add_argument('-d2', '--dataset2', type=lambda d: datasets[d.lower()],

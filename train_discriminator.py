@@ -32,8 +32,8 @@ datasets = {
     'trec-hi': TrecHi_Dataset
 }
 
-parser.add_argument('--dataset', type=lambda d: datasets[d.lower()],
-                    choices=datasets.values(), required=True,
+parser.add_argument('dataset', type=lambda d: datasets[d.lower()],
+                    choices=datasets.values(),
                     help='Dataset to be used.')
 
 parser.add_argument('-t', '--tokenizer', type=str,
