@@ -8,7 +8,7 @@ import random
 
 class SST_Dataset:
 
-    def __init__(self, emb_dim=50, mbsize=50, main=True, dataset2=None,
+    def __init__(self, emb_dim=50, mbsize=32, main=True, dataset2=None,
                  **kwargs):
         self.TEXT = data.Field(init_token='<start>', eos_token='<eos>',
                                lower=True, tokenize='spacy', fix_length=16)
@@ -22,7 +22,7 @@ class SST_Dataset:
         self.train = train
 
         if main:
-            train_datasets = [train, dataset2.get_train()] \
+            train_datasets = [train.text, dataset2.get_train().text] \
                              if dataset2 else [train]
             self.TEXT.build_vocab(*train_datasets, vectors=FastText('en'))
             self.LABEL.build_vocab(train)
@@ -65,7 +65,7 @@ class SST_Dataset:
 
 class IMDB_Dataset:
 
-    def __init__(self, emb_dim=50, mbsize=50, main=True, dataset2=None,
+    def __init__(self, emb_dim=50, mbsize=32, main=True, dataset2=None,
                  **kwargs):
         self.TEXT = data.Field(init_token='<start>', eos_token='<eos>',
                                lower=True, tokenize='spacy', fix_length=None)
@@ -78,13 +78,14 @@ class IMDB_Dataset:
         self.train = train
 
         if main:
-            train_datasets = [train, dataset2.get_train()] \
+            train_datasets = [train.text, dataset2.get_train().text] \
                              if dataset2 else [train]
             self.TEXT.build_vocab(*train_datasets,
                                   vectors=GloVe('6B', dim=emb_dim))
             self.LABEL.build_vocab(train)
 
             self.n_vocab = len(self.TEXT.vocab.itos)
+            print(self.n_vocab)
             self.emb_dim = emb_dim
 
             self.train_iter, _ = data.BucketIterator.splits(
@@ -141,7 +142,7 @@ class WikiText_Dataset:
 
 class MyDataset:
     def __init__(self, dataset, emb='rand', emb_dim=300, tokenizer='word',
-                 ngrams=1, mbsize=50, language='en', max_filter_size=5,
+                 ngrams=1, mbsize=32, language='en', max_filter_size=5,
                  main=True, dataset2=None):
         self.TEXT = data.Field(init_token='<start>', eos_token='<eos>',
                                lower=True,
@@ -164,8 +165,9 @@ class MyDataset:
         self.train = train
 
         if main:
-            train_datasets = [train, dataset2.get_train()] \
+            train_datasets = [dataset2.get_train().text, train.text] \
                              if dataset2 else [train]
+            print(train_datasets, dataset2.get_train())
             self.TEXT.build_vocab(*train_datasets,
                                   vectors=utils.getEmbeddings(emb,
                                                               dim=emb_dim,
@@ -173,6 +175,7 @@ class MyDataset:
             self.LABEL.build_vocab(train)
 
             self.n_vocab = len(self.TEXT.vocab.itos)
+            print(self.n_vocab)
             self.emb_dim = emb_dim
 
             self.train_iter, self.val_iter, _ = data.BucketIterator.splits(

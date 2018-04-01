@@ -89,7 +89,7 @@ def filter(max_filter_size):
     return filter_pred
 
 
-def getModelName(params, d):
+def getModelName(params, d="d1"):
     if d == 'd2':
         modelName = "".join(["_", params.dataset2.__name__,
                              "_t", params.tokenizer,

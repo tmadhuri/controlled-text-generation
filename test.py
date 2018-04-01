@@ -1,6 +1,6 @@
 import torch
 
-from ctextgen.dataset import SST_Dataset
+from ctextgen.dataset import SST_Dataset, IMDB_Dataset
 from ctextgen.dataset import MR_Dataset, TeSA_Dataset, HiSA_Dataset
 from ctextgen.dataset import TrecEn_Dataset, TrecHi_Dataset
 from ctextgen.model import RNN_VAE
@@ -26,12 +26,17 @@ datasets = {
     'tesa': TeSA_Dataset,
     'hisa': HiSA_Dataset,
     'trec-en': TrecEn_Dataset,
-    'trec-hi': TrecHi_Dataset
+    'trec-hi': TrecHi_Dataset,
+    'imdb': IMDB_Dataset
 }
 
-parser.add_argument('--dataset', type=lambda d: datasets[d.lower()],
-                    choices=datasets.values(), required=True,
+parser.add_argument('dataset', type=lambda d: datasets[d.lower()],
+                    choices=datasets.values(),
                     help='Dataset to be used.')
+
+parser.add_argument('-d2', '--dataset2', type=lambda d: datasets[d.lower()],
+                    choices=datasets.values(), required=True,
+                    help='2nd Dataset to be used.')
 
 parser.add_argument('-t', '--tokenizer', type=str,
                     choices=["char", "word", "syl", "spacy"], required=True,
@@ -63,16 +68,24 @@ parser.add_argument('-u', '--units', type=int, default=100,
 
 args = parser.parse_args()
 
+dataset2 = args.dataset2(tokenizer=args.tokenizer,
+                         ngrams=args.ngrams,
+                         emb=args.embeddings,
+                         emb_dim=args.dimension,
+                         max_filter_size=max(args.filters),
+                         main=False)
+
 dataset = args.dataset(tokenizer=args.tokenizer,
                        ngrams=args.ngrams,
                        emb=args.embeddings,
                        emb_dim=args.dimension,
-                       max_filter_size=max(args.filters))
+                       max_filter_size=max(args.filters),
+                       dataset2=dataset2)
 
 
-mb_size = 50
+mb_size = 32
 z_dim = 20
-h_dim = args.dimension
+h_dim = 64
 lr = 1e-3
 lr_decay_every = 1000000
 n_iter = 10000
