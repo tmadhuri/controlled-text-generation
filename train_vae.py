@@ -5,6 +5,7 @@ import torch.optim as optim
 from ctextgen.dataset import SST_Dataset, IMDB_Dataset
 from ctextgen.dataset import MR_Dataset, TeSA_Dataset, HiSA_Dataset
 from ctextgen.dataset import TrecEn_Dataset, TrecHi_Dataset
+from ctextgen.dataset import WikiEn_Dataset, WikiHi_Dataset, WikiTe_Dataset
 from ctextgen.model import RNN_VAE
 from ctextgen import utils
 
@@ -30,7 +31,10 @@ datasets = {
     'hisa': HiSA_Dataset,
     'trec-en': TrecEn_Dataset,
     'trec-hi': TrecHi_Dataset,
-    'imdb': IMDB_Dataset
+    'imdb': IMDB_Dataset,
+    'wikien': WikiEn_Dataset,
+    'wikihi': WikiHi_Dataset,
+    'wikite': WikiTe_Dataset
 }
 
 parser.add_argument('dataset', type=lambda d: datasets[d.lower()],
