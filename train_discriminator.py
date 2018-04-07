@@ -157,8 +157,9 @@ def main():
         y_disc_real = model.forward_discriminator(inputs.transpose(0, 1))
         y_disc_fake = model.forward_discriminator(x_gen)
 
-        log_y_disc_fake = F.log_softmax(y_disc_fake, dim=1)
-        entropy = log_y_disc_fake.mean()
+        log_y_disc_fake = (F.softmax(y_disc_fake, dim=1) *
+                           F.log_softmax(y_disc_fake, dim=1))
+        entropy = -log_y_disc_fake.mean()
 
         loss_s = F.cross_entropy(y_disc_real, labels)
         loss_u = F.cross_entropy(y_disc_fake, fake_labels) + beta*entropy
