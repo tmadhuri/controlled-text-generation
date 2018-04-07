@@ -170,7 +170,7 @@ def save_model():
     if not os.path.exists('models/'):
         os.makedirs('models/')
 
-    if args.use_saved:
+    if args.use_saved or args.dataset2 is None:
         torch.save(model.state_dict(), ('models/vae' + utils.getModelName(args)
                                         + '.bin'))
     else:
