@@ -42,7 +42,7 @@ parser.add_argument('dataset', type=lambda d: datasets[d.lower()],
                     help='Dataset to be used.')
 
 parser.add_argument('-d2', '--dataset2', type=lambda d: datasets[d.lower()],
-                    choices=datasets.values(), required=True,
+                    choices=datasets.values(), default=None,
                     help='2nd Dataset to be used.')
 
 parser.add_argument('-t', '--tokenizer', type=str,
@@ -53,7 +53,8 @@ parser.add_argument('-n', '--ngrams', type=int, default=1,
                     help='Size of ngrams')
 
 parser.add_argument('-e', '--embeddings', type=str,
-                    choices=['Glove', 'word2vec', 'FastText', 'FastTextOOV', 'rand'],
+                    choices=['Glove', 'word2vec', 'FastText', 'FastTextOOV',
+                             'rand'],
                     default='rand',
                     help='Which embeddings to use.')
 
@@ -78,13 +79,15 @@ parser.add_argument('-b', '--batch_size', type=int, default=20,
 
 args = parser.parse_args()
 
-dataset2 = args.dataset2(tokenizer=args.tokenizer,
-                         ngrams=args.ngrams,
-                         emb=args.embeddings,
-                         emb_dim=args.dimension,
-                         max_filter_size=max(args.filters),
-                         main=False,
-                         mbsize=args.batch_size)
+dataset2 = None
+if args.dataset2 is not None:
+    dataset2 = args.dataset2(tokenizer=args.tokenizer,
+                             ngrams=args.ngrams,
+                             emb=args.embeddings,
+                             emb_dim=args.dimension,
+                             max_filter_size=max(args.filters),
+                             main=False,
+                             mbsize=args.batch_size)
 
 dataset = args.dataset(tokenizer=args.tokenizer,
                        ngrams=args.ngrams,
@@ -167,8 +170,8 @@ def main():
         loss_D = loss_s + lambda_u*loss_u
 
         loss_D.backward()
-        # grad_norm = torch.nn.utils.clip_grad_norm(model.discriminator_params,
-        #                                           5)
+        torch.nn.utils.clip_grad_norm(model.discriminator_params, 5)
+
         trainer_D.step()
         trainer_D.zero_grad()
 
@@ -192,7 +195,8 @@ def main():
         loss_G = loss_vae + lambda_c*loss_attr_c + lambda_z*loss_attr_z
 
         loss_G.backward()
-        grad_norm = torch.nn.utils.clip_grad_norm(model.decoder_params, 5)
+        torch.nn.utils.clip_grad_norm(model.decoder_params, 5)
+
         trainer_G.step()
         trainer_G.zero_grad()
 
@@ -202,7 +206,8 @@ def main():
         loss_E = recon_loss + kl_weight_max * kl_loss
 
         loss_E.backward()
-        # grad_norm = torch.nn.utils.clip_grad_norm(model.encoder_params, 5)
+        torch.nn.utils.clip_grad_norm(model.encoder_params, 5)
+
         trainer_E.step()
         trainer_E.zero_grad()
 

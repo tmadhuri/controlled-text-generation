@@ -39,7 +39,7 @@ parser.add_argument('dataset', type=lambda d: datasets[d.lower()],
                     help='Dataset to be used.')
 
 parser.add_argument('-d2', '--dataset2', type=lambda d: datasets[d.lower()],
-                    choices=datasets.values(), required=True,
+                    choices=datasets.values(), default=None,
                     help='2nd Dataset to be used.')
 
 parser.add_argument('-t', '--tokenizer', type=str,
@@ -50,7 +50,8 @@ parser.add_argument('-n', '--ngrams', type=int, default=1,
                     help='Size of ngrams')
 
 parser.add_argument('-e', '--embeddings', type=str,
-                    choices=['Glove', 'word2vec', 'FastText', 'FastTextOOV', 'rand'],
+                    choices=['Glove', 'word2vec', 'FastText', 'FastTextOOV',
+                             'rand'],
                     default='rand',
                     help='Which embeddings to use.')
 
@@ -75,13 +76,15 @@ parser.add_argument('-b', '--batch_size', type=int, default=32,
 
 args = parser.parse_args()
 
-dataset2 = args.dataset2(tokenizer=args.tokenizer,
-                         ngrams=args.ngrams,
-                         emb=args.embeddings,
-                         emb_dim=args.dimension,
-                         max_filter_size=max(args.filters),
-                         main=False,
-                         mbsize=args.batch_size)
+dataset2 = None
+if args.dataset2 is not None:
+    dataset2 = args.dataset2(tokenizer=args.tokenizer,
+                             ngrams=args.ngrams,
+                             emb=args.embeddings,
+                             emb_dim=args.dimension,
+                             max_filter_size=max(args.filters),
+                             main=False,
+                             mbsize=args.batch_size)
 
 dataset = args.dataset(tokenizer=args.tokenizer,
                        ngrams=args.ngrams,

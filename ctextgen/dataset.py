@@ -144,7 +144,6 @@ class MyDataset:
         if main:
             train_datasets = [dataset2.get_train().text, train.text] \
                              if dataset2 else [train]
-            print(train_datasets, dataset2.get_train())
             self.TEXT.build_vocab(*train_datasets,
                                   vectors=utils.getEmbeddings(emb,
                                                               dim=emb_dim,
@@ -246,7 +245,6 @@ class MyWikiDataset:
         if main:
             train_datasets = [dataset2.get_train().text, train.text] \
                              if dataset2 else [train]
-            print(train_datasets, dataset2.get_train())
             self.TEXT.build_vocab(*train_datasets,
                                   vectors=utils.getEmbeddings(emb,
                                                               dim=emb_dim,
