@@ -258,15 +258,18 @@ class RNN_VAE(nn.Module):
         Generate sentences of (mbsize x max_sent_len)
         """
         samples = []
+        targets_c = []
 
         for _ in range(mbsize):
             z = self.sample_z_prior(1)
             c = self.sample_c_prior(1)
             samples.append(self.sample_sentence(z, c, raw=True))
+            targets_c.append(c)
 
         X_gen = torch.cat(samples, dim=0)
+        _, targets_c = torch.cat(targets_c, dim=0).max(dim=1)
 
-        return X_gen
+        return X_gen, targets_c
 
     def sample_sentence(self, z, c, raw=False, temp=1):
         """
