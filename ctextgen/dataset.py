@@ -142,7 +142,7 @@ class WikiText_Dataset:
 
 class MyDataset:
     def __init__(self, dataset, emb='rand', emb_dim=300, tokenizer='word',
-                 ngrams=1, mbsize=32, language='en', max_filter_size=5,
+                 ngrams=1, mbsize=5, language='en', max_filter_size=5,
                  main=True, dataset2=None):
         self.TEXT = data.Field(init_token='<start>', eos_token='<eos>',
                                lower=True,
@@ -243,19 +243,19 @@ class TrecHi_Dataset(MyDataset):
 
 class MyWikiDataset:
     def __init__(self, dataset, emb='rand', emb_dim=300, tokenizer='word',
-                 ngrams=1, mbsize=32, language='en', max_filter_size=5,
+                 ngrams=1, mbsize=5, language='en', max_filter_size=5,
                  main=True, dataset2=None):
         self.TEXT = data.Field(init_token='<start>', eos_token='<eos>',
                                lower=True,
                                tokenize=utils.getTokenizer(tokenizer, ngrams,
                                                            'en'))
 
-        train, test = data.TabularDataset.splits(
+        train = data.TabularDataset.splits(
             fields=[('text', self.TEXT)],
             path=".data", train=(dataset + ".tokenized.short.out"),
-            format="tsv",
+            format='tsv',
             filter_pred=utils.filter(max_filter_size)
-        )
+        )[0]
 
         random.seed(1245)
         train, val = train.split(0.9, stratified=False, strata_field='label',
@@ -275,7 +275,7 @@ class MyWikiDataset:
             print(self.n_vocab)
             self.emb_dim = emb_dim
 
-            self.train_iter, self.val_iter, _ = data.BucketIterator.splits(
+            self.train_iter, self.val_iter = data.BucketIterator.splits(
                 (train, val), batch_size=mbsize, device=-1, shuffle=True,
                 sort_key=utils.sort_key
             )
@@ -289,17 +289,17 @@ class MyWikiDataset:
             batch = next(iter(self.train_iter))
 
         if gpu:
-            return batch.text.cuda()
+            return batch.text.cuda(), None
 
-        return batch.text
+        return batch.text, None
 
     def next_validation_batch(self, gpu=False):
         batch = next(iter(self.val_iter))
 
         if gpu:
-            return batch.text.cuda()
+            return batch.text.cuda(), None
 
-        return batch.text
+        return batch.text, None
 
     def idxs2sentence(self, idxs):
         return ' '.join([self.TEXT.vocab.itos[i] for i in idxs])

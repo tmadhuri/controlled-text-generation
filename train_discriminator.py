@@ -73,6 +73,9 @@ parser.add_argument('-f', '--filters', type=int, default=3,
 parser.add_argument('-u', '--units', type=int, default=100,
                     help='Number of filters in discriminator.')
 
+parser.add_argument('-b', '--batch_size', type=int, default=20,
+                    help='Number of filters in discriminator.')
+
 args = parser.parse_args()
 
 dataset2 = args.dataset2(tokenizer=args.tokenizer,
@@ -80,22 +83,24 @@ dataset2 = args.dataset2(tokenizer=args.tokenizer,
                          emb=args.embeddings,
                          emb_dim=args.dimension,
                          max_filter_size=max(args.filters),
-                         main=False)
+                         main=False,
+                         mbsize=args.batch_size)
 
 dataset = args.dataset(tokenizer=args.tokenizer,
                        ngrams=args.ngrams,
                        emb=args.embeddings,
                        emb_dim=args.dimension,
                        max_filter_size=max(args.filters),
-                       dataset2=dataset2)
+                       dataset2=dataset2,
+                       mbsize=args.batch_size)
 
 
-mbsize = 20
+mbsize = args.batch_size
 z_dim = 20
 h_dim = 64
 lr = 1e-3
 lr_decay_every = 1000000
-n_iter = 5000
+n_iter = 15000
 log_interval = 100
 z_dim = h_dim
 c_dim = args.num_classes
@@ -186,7 +191,7 @@ def main():
         loss_G = loss_vae + lambda_c*loss_attr_c + lambda_z*loss_attr_z
 
         loss_G.backward()
-        # grad_norm = torch.nn.utils.clip_grad_norm(model.decoder_params, 5)
+        grad_norm = torch.nn.utils.clip_grad_norm(model.decoder_params, 5)
         trainer_G.step()
         trainer_G.zero_grad()
 

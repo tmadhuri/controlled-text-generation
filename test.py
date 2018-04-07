@@ -70,6 +70,9 @@ parser.add_argument('-f', '--filters', type=int, default=3,
 parser.add_argument('-u', '--units', type=int, default=100,
                     help='Number of filters in discriminator.')
 
+parser.add_argument('-b', '--batch_size', type=int, default=32,
+                    help='Number of filters in discriminator.')
+
 args = parser.parse_args()
 
 dataset2 = args.dataset2(tokenizer=args.tokenizer,
@@ -77,17 +80,19 @@ dataset2 = args.dataset2(tokenizer=args.tokenizer,
                          emb=args.embeddings,
                          emb_dim=args.dimension,
                          max_filter_size=max(args.filters),
-                         main=False)
+                         main=False,
+                         mbsize=args.batch_size)
 
 dataset = args.dataset(tokenizer=args.tokenizer,
                        ngrams=args.ngrams,
                        emb=args.embeddings,
                        emb_dim=args.dimension,
                        max_filter_size=max(args.filters),
-                       dataset2=dataset2)
+                       dataset2=dataset2,
+                       mbsize=args.batch_size)
 
 
-mb_size = 32
+mb_size = args.batch_size
 z_dim = 20
 h_dim = 64
 lr = 1e-3
@@ -134,8 +139,7 @@ for i in range(n_iter):
         _, c_idx = torch.max(c, dim=1)
         sample_idxs = model.sample_sentence(z, c, temp=0.1)
 
-        outputFile.write('{}\t{}\n'.format(dataset.idxs2sentence(sample_idxs)
-                                           .encode('utf8'),
+        outputFile.write('{}\t{}\n'.format(dataset.idxs2sentence(sample_idxs),
                                            str(dataset.idx2label(int(c_idx)))))
 
 
