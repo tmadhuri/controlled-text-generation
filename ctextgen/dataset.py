@@ -31,14 +31,18 @@ class SST_Dataset:
             self.emb_dim = emb_dim
 
             self.train_iter, self.val_iter, _ = data.BucketIterator.splits(
-                (train, val, test), batch_size=mbsize, device=-1, shuffle=True
+                (train, val, test), batch_size=mbsize, device=-1, shuffle=True,
+                repeat=True
             )
+
+            self.train_iter = iter(self.train_iter)
+            self.val_iter = iter(self.val_iter)
 
     def get_vocab_vectors(self):
         return self.TEXT.vocab.vectors
 
     def next_batch(self, gpu=False):
-        batch = next(iter(self.train_iter))
+        batch = next(self.train_iter)
 
         if gpu:
             return batch.text.cuda(), batch.label.cuda()
@@ -46,7 +50,7 @@ class SST_Dataset:
         return batch.text, batch.label
 
     def next_validation_batch(self, gpu=False):
-        batch = next(iter(self.val_iter))
+        batch = next(self.val_iter)
 
         if gpu:
             return batch.text.cuda(), batch.label.cuda()
@@ -89,14 +93,17 @@ class IMDB_Dataset:
             self.emb_dim = emb_dim
 
             self.train_iter, _ = data.BucketIterator.splits(
-                (train, test), batch_size=mbsize, device=-1, shuffle=True
+                (train, test), batch_size=mbsize, device=-1, shuffle=True,
+                repeat=True
             )
+
+            self.train_iter = iter(self.train_iter)
 
     def get_vocab_vectors(self):
         return self.TEXT.vocab.vectors
 
     def next_batch(self, gpu=False):
-        batch = next(iter(self.train_iter))
+        batch = next(self.train_iter)
 
         if gpu:
             return batch.text.cuda(), batch.label.cuda()
@@ -108,36 +115,6 @@ class IMDB_Dataset:
 
     def get_train(self):
         return self.train
-
-
-class WikiText_Dataset:
-
-    def __init__(self, emb_dim=50, mbsize=32):
-        self.TEXT = data.Field(init_token='<start>', eos_token='<eos>',
-                               lower=True, tokenize='spacy', fix_length=None)
-        self.LABEL = data.Field(sequential=False, unk_token=None)
-
-        train, val, test = datasets.WikiText2.splits(self.TEXT)
-
-        self.TEXT.build_vocab(train, vectors=GloVe('6B', dim=emb_dim))
-        self.LABEL.build_vocab(train)
-
-        self.n_vocab = len(self.TEXT.vocab.itos)
-        self.emb_dim = emb_dim
-
-        self.train_iter, _, _ = data.BPTTIterator.splits(
-            (train, val, test), batch_size=10, bptt_len=15, device=-1
-        )
-
-    def get_vocab_vectors(self):
-        return self.TEXT.vocab.vectors
-
-    def next_batch(self, gpu=False):
-        batch = next(iter(self.train_iter))
-        return batch.text.cuda() if gpu else batch.text
-
-    def idxs2sentence(self, idxs):
-        return ' '.join([self.TEXT.vocab.itos[i] for i in idxs])
 
 
 class MyDataset:
@@ -180,16 +157,19 @@ class MyDataset:
 
             self.train_iter, self.val_iter, _ = data.BucketIterator.splits(
                 (train, val, test), batch_size=mbsize, device=-1, shuffle=True,
-                sort_key=utils.sort_key
+                sort_key=utils.sort_key, repeat=True
             )
+
+            self.train_iter = iter(self.train_iter)
+            self.val_iter = iter(self.val_iter)
 
     def get_vocab_vectors(self):
         return self.TEXT.vocab.vectors
 
     def next_batch(self, gpu=False):
-        batch = next(iter(self.train_iter))
+        batch = next(self.train_iter)
         if batch.batch_size == 1:
-            batch = next(iter(self.train_iter))
+            batch = next(self.train_iter)
 
         if gpu:
             return batch.text.cuda(), batch.label.cuda()
@@ -197,7 +177,7 @@ class MyDataset:
         return batch.text, batch.label
 
     def next_validation_batch(self, gpu=False):
-        batch = next(iter(self.val_iter))
+        batch = next(self.val_iter)
 
         if gpu:
             return batch.text.cuda(), batch.label.cuda()
@@ -277,16 +257,19 @@ class MyWikiDataset:
 
             self.train_iter, self.val_iter = data.BucketIterator.splits(
                 (train, val), batch_size=mbsize, device=-1, shuffle=True,
-                sort_key=utils.sort_key
+                sort_key=utils.sort_key, repeat=True
             )
+
+            self.train_iter = iter(self.train_iter)
+            self.val_iter = iter(self.val_iter)
 
     def get_vocab_vectors(self):
         return self.TEXT.vocab.vectors
 
     def next_batch(self, gpu=False):
-        batch = next(iter(self.train_iter))
+        batch = next(self.train_iter)
         if batch.batch_size == 1:
-            batch = next(iter(self.train_iter))
+            batch = next(self.train_iter)
 
         if gpu:
             return batch.text.cuda(), None
@@ -294,7 +277,7 @@ class MyWikiDataset:
         return batch.text, None
 
     def next_validation_batch(self, gpu=False):
-        batch = next(iter(self.val_iter))
+        batch = next(self.val_iter)
 
         if gpu:
             return batch.text.cuda(), None
